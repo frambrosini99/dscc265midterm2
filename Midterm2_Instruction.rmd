@@ -48,6 +48,89 @@ First of all, combine the train and test data sets, create dummies for all categ
 
 - Explore tree-based methods, choose the one that is your favorite and yielding optimal results, and then search for one optimal ANN architecture for the regression problem (so two models to report). Fit and make sophisticated decisions by justifying and writing precisely. Report `the test MSE` results in a comparative table along with the methods so the grader can capture all your efforts on building various models in one table.
 
+```{r eval=TRUE}
+
+train <- read.csv("/Users/Francisco/Desktop/SPRING_2021/dscc265/dscc265midterm1/StudentDataTrain.csv")
+test <- read.csv("/Users/Francisco/Desktop/SPRING_2021/dscc265/dscc265midterm1/StudentDataTest.csv")
+
+train <- na.omit(train)
+test <- na.omit(test)
+
+#replacing Race_Ethc_Visa with a dummy variable for each country (and multi if all dummies equal 0)
+hist = rep(1, length=nrow(train))
+hist[train$Race_Ethc_Visa!="Hispanic"] = 0
+afr = rep(1, length=nrow(train))
+afr[train$Race_Ethc_Visa!="Afram"] = 0
+whi = rep(1, length=nrow(train))
+whi[train$Race_Ethc_Visa!="White"] = 0
+asi = rep(1, length=nrow(train))
+asi[train$Race_Ethc_Visa!="Asian"] = 0
+train = cbind(train, hist, afr, whi, asi)
+train = train[,-1]
+hist = rep(1, length=nrow(test))
+hist[test$Race_Ethc_Visa!="Hispanic"] = 0
+afr = rep(1, length=nrow(test))
+afr[test$Race_Ethc_Visa!="Afram"] = 0
+whi = rep(1, length=nrow(test))
+whi[test$Race_Ethc_Visa!="White"] = 0
+asi = rep(1, length=nrow(test))
+asi[test$Race_Ethc_Visa!="Asian"] = 0
+test = cbind(test, hist, afr, whi, asi)
+test = test[,-1]
+
+#dummy variables
+genderD <- ifelse(train$Gender=="Male", 1, 0)
+genderD = as.factor(genderD)
+train$Gender = genderD
+genderD <- ifelse(test$Gender=="Male", 1, 0)
+genderD = as.factor(genderD)
+test$Gender = genderD
+
+train$Entry_Term = as.factor(train$Entry_Term)
+test$Entry_Term = as.factor(test$Entry_Term)
+term2131 = rep(1, length=nrow(train))
+term2131[train$Entry_Term!="2131"] = 0
+term2141 = rep(1, length=nrow(train))
+term2141[train$Entry_Term!="2141"] = 0
+term2151 = rep(1, length=nrow(train))
+term2151[train$Entry_Term!="2151"] = 0
+train = cbind(train, term2131, term2141, term2151)
+train = train[,-4]
+
+term2131 = rep(1, length=nrow(test))
+term2131[train$Entry_Term!="2131"] = 0
+term2141 = rep(1, length=nrow(test))
+term2141[train$Entry_Term!="2141"] = 0
+term2151 = rep(1, length=nrow(test))
+term2151[train$Entry_Term!="2151"] = 0
+test = cbind(test, term2131, term2141, term2151)
+test = test[,-4]
+
+train$Persistence.NextYear = as.factor(train$Persistence.NextYear)
+test$Persistence.NextYear = as.factor(test$Persistence.NextYear)
+
+train$FullTimeStudent = as.factor(train$FullTimeStudent)
+test$FullTimeStudent = as.factor(test$FullTimeStudent)
+
+f = c(1,5,16:23)
+
+train.sc = scale(train[,-f])
+train.sc = cbind(train.sc, train[,f])
+
+test.sc = scale(test[,-f])
+test.sc = cbind(test.sc, test[,f])
+
+
+
+reg.tree=randomForest(Term.GPA~.,data=train.sc[,-15],
+                        mtry=5,
+                        importance=TRUE)
+reg.tree
+
+
+
+```
+
 \section{B. Improving Classification Models - 20 pts}
 
 - Explore tree-based methods, choose the one that is your favorite and yielding optimal results, and then search for one optimal ANN architecture for the classification problem (so two models to report). Fit and make sophisticated decisions by justifying and writing precisely. Report `the test accuracy` and `the test F1` results in a comparative table along with the methods so the grader can capture all your efforts in one table.
